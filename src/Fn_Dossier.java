@@ -47,44 +47,44 @@ public class Fn_Dossier extends JFrame {
     }
 
     private void loadElevesData() {
-    //    try {
-    //        // Connexion à la base de données Oracle
-    //       DBConnection con = new DBConnection();
-    //       query = "SELECT * FROM eleve";
-    //       ps = con.getCon().prepareStatement(query);
-    //       rs = ps.executeQuery();
-    //        // Création du modèle de table
-    //        DefaultTableModel model = new DefaultTableModel();
-    //        model.addColumn("Matricule");
-    //        model.addColumn("Nom");
-    //        model.addColumn("Prénom");
-    //        model.addColumn("Date de Naissance");
-    //        model.addColumn("Lieu de Naissance");
-    //        model.addColumn("Pere");
-    //        model.addColumn("Mere");
-    //        model.addColumn("Adresse");
-    //        model.addColumn("tuteur");
-    //        model.addColumn("num tuteur");
-    //        model.addColumn("classe");
-    //        while(rs.next()) {
-    //
-    //           model.addRow(new Object[]{rs.getString("matricule"), rs.getString("nom"), rs.getString("prenom"), rs.getString("date_naiss"),
-    //                  rs.getString("lieu_naiss"),rs.getString("date_naiss"),rs.getString("pere"),rs.getString("mere"),
-    //                    rs.getString("tuteur"),rs.getString("num_tuteur"),rs.getInt("classe")
-    //           });
-    //        }
-    //
-    //        // Fermeture des ressources
-    //        rs.close();
-    //        ps.close();
-    //
-    //
-    //        // Définir le modèle de table pour la JTable
-    //        elevesTable.setModel(model);
-    //
-    //    } catch (SQLException e) {
-    //        JOptionPane.showMessageDialog(null, "Erreur lors du chargement des données des élèves. Erreur" + e.getMessage());
-    //    }
+       try {
+           // Connexion à la base de données Oracle
+          DBConnection con = new DBConnection();
+          query = "SELECT * FROM ecolier";
+          ps = con.getCon().prepareStatement(query);
+          rs = ps.executeQuery();
+           // Création du modèle de table
+           DefaultTableModel model = new DefaultTableModel();
+           model.addColumn("Matricule");
+           model.addColumn("Nom");
+           model.addColumn("Prénom");
+           model.addColumn("Date de Naissance");
+           model.addColumn("Lieu de Naissance");
+           model.addColumn("Pere");
+           model.addColumn("Mere");
+           model.addColumn("Adresse");
+           model.addColumn("tuteur");
+           model.addColumn("num tuteur");
+           model.addColumn("classe");
+           while(rs.next()) {
+   
+              model.addRow(new Object[]{rs.getString("matricule"), rs.getString("nom"), rs.getString("prenom"), rs.getString("date_naiss"),
+                     rs.getString("lieu_naiss"),rs.getString("date_naiss"),rs.getString("pere"),rs.getString("mere"),
+                       rs.getString("tuteur"),rs.getString("num_tuteur"),rs.getInt("classe")
+              });
+           }
+   
+           // Fermeture des ressources
+           rs.close();
+           ps.close();
+   
+   
+           // Définir le modèle de table pour la JTable
+           elevesTable.setModel(model);
+   
+       } catch (SQLException e) {
+           JOptionPane.showMessageDialog(null, "Erreur lors du chargement des données des élèves. Erreur" + e.getMessage());
+       }
     }
 
 

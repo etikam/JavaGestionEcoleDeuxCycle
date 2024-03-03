@@ -10,7 +10,8 @@ public class Main {
     public static void main(String[] args) {
             //Initialisation des variables
 
-    Fen_Dossier f = new Fen_Dossier();
+    Fn_Dossier f = new Fn_Dossier();
+
 
     }
 }
