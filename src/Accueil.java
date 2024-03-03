@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 public class Accueil extends JFrame {
@@ -15,6 +17,20 @@ public class Accueil extends JFrame {
     final private JPanel p_fonctionnalite_examen = new JPanel();
     final private JPanel p_header_examen = new JPanel();
     final private JPanel p_footer_examen = new JPanel();
+//Création des buttons pour les differente fonctionnalité du primaire
+    private JButton btn_eleve_primaire = new JButton();
+    private JButton btn_enseignant_primaire = new JButton();
+    private JButton btn_notes_primaire = new JButton();
+    private JButton btn_historique_primaire = new JButton();
+    private JButton btn_dossier_primaire = new JButton();
+
+    //Création des buttons pour les differente fonctionnalité du collège
+    private JButton btn_eleve_college = new JButton();
+    private JButton btn_enseignant_college = new JButton();
+    private JButton btn_notes_college = new JButton();
+    private JButton btn_historique_college = new JButton();
+    private JButton btn_dossier_college = new JButton();
+    private JButton btn_matiere_college = new JButton();
 
 
     public Accueil() {
@@ -36,6 +52,17 @@ public class Accueil extends JFrame {
         initUI_primaire(); //initialisation de l'onglet du primaire
         initUI_college(); //initialisation de l'onglet du collège
         initUI_examen();  //initialisation de l'onglet de l'examen
+
+
+        btn_eleve_primaire.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //Ouverture de la fenetre de gestion des eleves
+
+                Fn_Dossier fn = new Fn_Dossier();
+            }
+        });
+
 
 
         setVisible(true);
@@ -78,14 +105,14 @@ public class Accueil extends JFrame {
         //Ajout des Cards au conteneur de fonctionnalité pour le primaire
         String desc1 = "Ici la gestion de tout ce qui concerne les Elèves";
         String desc2 = "Ici la gestion de tout ce qui concerne les Enseignants";
-        String desc3 = "Ici la gestion de tout ce qui concerne les Notes";
+        String desc3 = "Ici la gestion de tout ce qui concerne les Notes/Résultat";
         String desc4 = "Ici la gestion de tout ce qui concerne l'historiques des Elèves";
         String desc5 = "Ici la gestion de tout ce qui concerne les Dossiers des Eleves";
-        p_fonctionnalite.add(new Card("Eleve", desc1, new ImageIcon("assets/students.png"), new JButton()));
-        p_fonctionnalite.add(new Card("Enseignants", desc2, new ImageIcon("assets/enseignants.png"), new JButton()));
-        p_fonctionnalite.add(new Card("Notes", desc3, new ImageIcon("assets/notes.png"), new JButton()));
-        p_fonctionnalite.add(new Card("Historique", desc4, new ImageIcon("assets/historiques.png"), new JButton()));
-        p_fonctionnalite.add(new Card("Dossiers", desc5, new ImageIcon("assets/dossiers.png"), new JButton()));
+        p_fonctionnalite.add(new Card("Eleve", desc1, new ImageIcon("assets/students.png"), btn_eleve_primaire));
+        p_fonctionnalite.add(new Card("Enseignants", desc2, new ImageIcon("assets/enseignants.png"), btn_enseignant_primaire));
+        p_fonctionnalite.add(new Card("Notes", desc3, new ImageIcon("assets/notes.png"), btn_notes_primaire));
+        p_fonctionnalite.add(new Card("Historique", desc4, new ImageIcon("assets/historiques.png"), btn_historique_primaire));
+        p_fonctionnalite.add(new Card("Dossiers", desc5, new ImageIcon("assets/dossiers.png"), btn_dossier_primaire));
         // Ajout du panneau de fonctionnalité au panneau primaire
 
         // Ajout des onglets à la fenêtre
@@ -184,4 +211,9 @@ public class Accueil extends JFrame {
         p_footer_examen.setPreferredSize(new Dimension(getWidth(), 50)); // Hauteur fixe de 50 pixels
 
     }
+
+
+
+    //=====================EVENEMENTS SUR LES BOUTTONS=============================//
+
 }

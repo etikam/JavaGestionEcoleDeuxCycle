@@ -29,7 +29,7 @@ public class login  extends JFrame {
         error_auth.setForeground(Color.red);
         error_auth.setVisible(false);
 
-
+        setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
             /*=========CONTENU DU PREMIER CONTENEUR (pour l'image)  */
