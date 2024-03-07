@@ -59,7 +59,7 @@ public class Accueil extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 //Ouverture de la fenetre de gestion des eleves
 
-                Fn_Dossier fn = new Fn_Dossier();
+                ElevePrimaire fn = new ElevePrimaire();
             }
         });
 
