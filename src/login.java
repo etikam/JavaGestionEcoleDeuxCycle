@@ -71,7 +71,7 @@ public class login  extends JFrame {
     private void conteur2(){
         p2.setBackground(Color.WHITE);
         Paneau p_champ = new Paneau(); // un sous panneau pour les champ
-        p_champ.setLayout(new GridLayout(4,1,2,2));
+        p_champ.setLayout(new GridLayout(4 ,1,2,2));
         p_champ.setBackground(Color.WHITE);
         JLabel l_username = new JLabel("Username: ");
         l_username.setHorizontalAlignment(SwingConstants.CENTER);
