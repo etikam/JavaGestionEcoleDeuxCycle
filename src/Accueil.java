@@ -59,6 +59,15 @@ public class Accueil extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 //Ouverture de la fenetre de gestion des eleves
 
+                Fn_Dossier fn = new Fn_Dossier();
+            }
+        });
+
+        btn_eleve_primaire.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //Ouverture de la fenetre de gestion des eleves
+
                 ElevePrimaire fn = new ElevePrimaire();
             }
         });

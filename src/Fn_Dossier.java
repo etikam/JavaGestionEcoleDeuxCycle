@@ -161,7 +161,7 @@ public class Fn_Dossier extends JFrame {
 
                 model.addRow(new Object[]{rs.getString("matricule"), rs.getString("nom"), rs.getString("prenom"), date,
                         rs.getString("lieu_naiss"), rs.getString("pere"), rs.getString("mere"),
-                        rs.getString("adresse"), rs.getString("tuteur"), rs.getString("num_tuteur"), class_in_table,rs.getString("date_inscription")
+                        rs.getString("adresse"), rs.getString("tuteur"), rs.getString("num_tuteur"), class_in_table,rs.getString("date_ins")
                 });
             }
 

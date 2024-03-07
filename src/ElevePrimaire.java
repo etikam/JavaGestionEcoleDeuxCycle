@@ -77,6 +77,14 @@ public class ElevePrimaire extends JFrame {
         JTextField prenomField = new JTextField(20);
         panel.add(prenomField, gbc);
 
+        // Ajout du champ pour le Sexe
+        gbc.gridx = 0;
+        gbc.gridy++;
+        panel.add(new JLabel("Sexe :"), gbc);
+        gbc.gridx = 1;
+        JComboBox<String> sexeComboBox = new JComboBox<>(new String[]{"M", "F"});
+        panel.add(sexeComboBox, gbc);
+
         // Ajout du champ pour la Date de Naissance
         gbc.gridx = 0;
         gbc.gridy++;
@@ -162,27 +170,50 @@ public class ElevePrimaire extends JFrame {
                 // Insérer les données dans la base de données
                 try {
                     Connection connection = dbConnection.getCon();
-                    String query = "INSERT INTO ecolier(matricule, nom, prenom, date_naiss, lieu_naiss, pere, mere, adresse, tuteur, num_tuteur, classe, date_insc) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-                    PreparedStatement preparedStatement = connection.prepareStatement(query);
-                    preparedStatement.setString(1, matriculeField.getText());
-                    preparedStatement.setString(2, nomField.getText());
-                    preparedStatement.setString(3, prenomField.getText());
-                    preparedStatement.setString(4, dateNaissanceField.getText());
-                    preparedStatement.setString(5, lieuNaissanceField.getText());
-                    preparedStatement.setString(6, pereField.getText());
-                    preparedStatement.setString(7, mereField.getText());
-                    preparedStatement.setString(8, adresseField.getText());
-                    preparedStatement.setString(9, tuteurField.getText());
-                    preparedStatement.setString(10, numeroTuteurField.getText());
-                    preparedStatement.setString(11, classeField.getText());
-                    preparedStatement.setString(12, dateInscriptionField.getText());
+                    String queryEcolier = "INSERT INTO ecolier(matricule, nom, prenom,  date_naiss, lieu_naiss, pere, mere, adresse, tuteur, num_tuteur, classe, date_ins,sexe) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    String queryElevePrimaire = "INSERT INTO eleve_primaire(matricule, nom, prenom, sexe, classe, status) VALUES (?, ?, ?, ?, ?, ?)";
 
-                    preparedStatement.executeUpdate();
+                    PreparedStatement preparedStatementEcolier = connection.prepareStatement(queryEcolier);
+                    PreparedStatement preparedStatementElevePrimaire = connection.prepareStatement(queryElevePrimaire);
+
+                    // Set parameters for ecolier table
+                    preparedStatementEcolier.setString(1, matriculeField.getText());
+                    preparedStatementEcolier.setString(2, nomField.getText());
+                    preparedStatementEcolier.setString(3, prenomField.getText());
+
+                    preparedStatementEcolier.setString(4, dateNaissanceField.getText());
+                    preparedStatementEcolier.setString(5, lieuNaissanceField.getText());
+                    preparedStatementEcolier.setString(6, pereField.getText());
+                    preparedStatementEcolier.setString(7, mereField.getText());
+                    preparedStatementEcolier.setString(8, adresseField.getText());
+                    preparedStatementEcolier.setString(9, tuteurField.getText());
+                    preparedStatementEcolier.setString(10, numeroTuteurField.getText());
+                    preparedStatementEcolier.setString(11, classeField.getText());
+                    preparedStatementEcolier.setString(12, dateInscriptionField.getText());
+                    preparedStatementEcolier.setString(13, (String)sexeComboBox.getSelectedItem());
+
+                    // Execute query for ecolier table
+                    preparedStatementEcolier.executeUpdate();
+
+                    // Set parameters for eleve_primaire table
+                    preparedStatementElevePrimaire.setString(1, matriculeField.getText());
+                    preparedStatementElevePrimaire.setString(2, nomField.getText());
+                    preparedStatementElevePrimaire.setString(3, prenomField.getText());
+                    preparedStatementElevePrimaire.setString(4, (String)sexeComboBox.getSelectedItem());
+                    preparedStatementElevePrimaire.setString(5, classeField.getText());
+                    preparedStatementElevePrimaire.setString(6, "N"); // Assuming status is always 'N' initially
+
+                    // Execute query for eleve_primaire table
+                    preparedStatementElevePrimaire.executeUpdate();
+
+                    // Close prepared statements
+                    preparedStatementEcolier.close();
+                    preparedStatementElevePrimaire.close();
+
                     JOptionPane.showMessageDialog(null, "L'élève a été inscrit avec succès !");
-                    preparedStatement.close();
                 } catch (SQLException ex) {
                     ex.printStackTrace();
-                    JOptionPane.showMessageDialog(null, "Erreur lors de l'inscription de l'élève !");
+                    JOptionPane.showMessageDialog(null, "Erreur lors de l'inscription de l'élève !" + ex.getMessage());
                 }
             }
         });
@@ -201,6 +232,5 @@ public class ElevePrimaire extends JFrame {
         // Ajoutez ici les composants pour afficher la liste d'élèves
         return panel;
     }
-
 
 }
