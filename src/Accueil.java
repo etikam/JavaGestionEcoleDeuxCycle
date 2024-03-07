@@ -54,7 +54,7 @@ public class Accueil extends JFrame {
         initUI_examen();  //initialisation de l'onglet de l'examen
 
 
-        btn_eleve_primaire.addActionListener(new ActionListener() {
+        btn_dossier_primaire.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //Ouverture de la fenetre de gestion des eleves

@@ -15,7 +15,7 @@ public class DBConnection {
 
             // Etablissement de la connexion
             con = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-            System.out.println("Connection reusi");
+            //System.out.println("Connection reusi");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
             System.err.println("Impossible de charger le pilote JDBC Oracle");
