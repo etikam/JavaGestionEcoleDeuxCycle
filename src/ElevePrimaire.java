@@ -19,7 +19,7 @@ public class ElevePrimaire extends JFrame {
     // Création des onglets et des panneaux
     private JTabbedPane onglets = new JTabbedPane();  // les onglets
     private JPanel inscriptionPanel = new JPanel(); //l'onglet d'inscription
-    private JPanel reInscriptionPanel = new JPanel(); // l'onglet de réinscription
+    private JPanel reInscriptionPanel = createReInscriptionPanel(); // l'onglet de réinscription
     private JPanel listePanel = new JPanel();  // l'onglet de liste
     private JTable elevesTable = new JTable();  // la table des eleves pour l'onglet de liste
 
@@ -58,6 +58,9 @@ public class ElevePrimaire extends JFrame {
 
         // Ajout des onglets à la JTabbedPane
         onglets.addTab("Inscription", inscriptionPanel);
+        inscriptionPanel.setBackground(Color.gray);
+        JPanel p = createFormulairePanel();
+        inscriptionPanel.add(p);
         onglets.addTab("Réinscription", reInscriptionPanel);
         onglets.addTab("Liste", listePanel);
 
@@ -76,29 +79,25 @@ public class ElevePrimaire extends JFrame {
     private JPanel createFormulairePanel() {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(10, 10, 10, 10), // Marge autour du formulaire
-                BorderFactory.createLineBorder(Color.BLACK) // Bordure noire autour du formulaire
+                BorderFactory.createEmptyBorder(10, 10, 10, 10),
+                BorderFactory.createLineBorder(Color.BLACK)
         ));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(10, 10, 10, 10); // Marge entre les composants
+        gbc.insets = new Insets(10, 10, 10, 10);
 
-        // Ajout du texte "Ajouter un nouvel élève" au-dessus du formulaire
-        JLabel titreLabel = new JLabel("Ajouter un nouvel élève");
+        JLabel titreLabel = new JLabel("Ajouté un nouvel élève");
         titreLabel.setFont(new Font("Arial", Font.BOLD, 16));
         panel.add(titreLabel, gbc);
 
-        gbc.gridy++; // Passer à la ligne suivante pour le formulaire
-
-        // Ajout des labels et des champs de texte pour chaque champ
+        gbc.gridy++;
         panel.add(new JLabel("Matricule :"), gbc);
         gbc.gridx = 1;
         JTextField matriculeField = new JTextField(20);
         panel.add(matriculeField, gbc);
 
-        // Réinitialisation de la position pour les composants suivants
         gbc.gridx = 0;
         gbc.gridy++;
         panel.add(new JLabel("Nom :"), gbc);
@@ -106,7 +105,6 @@ public class ElevePrimaire extends JFrame {
         JTextField nomField = new JTextField(20);
         panel.add(nomField, gbc);
 
-        // Ajout du champ pour le Prénom
         gbc.gridx = 0;
         gbc.gridy++;
         panel.add(new JLabel("Prénom :"), gbc);
@@ -114,7 +112,6 @@ public class ElevePrimaire extends JFrame {
         JTextField prenomField = new JTextField(20);
         panel.add(prenomField, gbc);
 
-        // Ajout du champ pour le Sexe
         gbc.gridx = 0;
         gbc.gridy++;
         panel.add(new JLabel("Sexe :"), gbc);
@@ -122,7 +119,6 @@ public class ElevePrimaire extends JFrame {
         JComboBox<String> sexeComboBox = new JComboBox<>(new String[]{"M", "F"});
         panel.add(sexeComboBox, gbc);
 
-        // Ajout du champ pour la Date de Naissance
         gbc.gridx = 0;
         gbc.gridy++;
         panel.add(new JLabel("Date de Naissance :"), gbc);
@@ -130,7 +126,6 @@ public class ElevePrimaire extends JFrame {
         JTextField dateNaissanceField = new JTextField(20);
         panel.add(dateNaissanceField, gbc);
 
-        // Ajout du champ pour le Lieu de Naissance
         gbc.gridx = 0;
         gbc.gridy++;
         panel.add(new JLabel("Lieu de Naissance :"), gbc);
@@ -138,7 +133,6 @@ public class ElevePrimaire extends JFrame {
         JTextField lieuNaissanceField = new JTextField(20);
         panel.add(lieuNaissanceField, gbc);
 
-        // Ajout du champ pour le Père
         gbc.gridx = 0;
         gbc.gridy++;
         panel.add(new JLabel("Père :"), gbc);
@@ -146,7 +140,6 @@ public class ElevePrimaire extends JFrame {
         JTextField pereField = new JTextField(20);
         panel.add(pereField, gbc);
 
-        // Ajout du champ pour la Mère
         gbc.gridx = 0;
         gbc.gridy++;
         panel.add(new JLabel("Mère :"), gbc);
@@ -154,7 +147,6 @@ public class ElevePrimaire extends JFrame {
         JTextField mereField = new JTextField(20);
         panel.add(mereField, gbc);
 
-        // Ajout du champ pour l'Adresse
         gbc.gridx = 0;
         gbc.gridy++;
         panel.add(new JLabel("Adresse :"), gbc);
@@ -162,7 +154,6 @@ public class ElevePrimaire extends JFrame {
         JTextField adresseField = new JTextField(20);
         panel.add(adresseField, gbc);
 
-        // Ajout du champ pour le Tuteur
         gbc.gridx = 0;
         gbc.gridy++;
         panel.add(new JLabel("Tuteur :"), gbc);
@@ -170,7 +161,6 @@ public class ElevePrimaire extends JFrame {
         JTextField tuteurField = new JTextField(20);
         panel.add(tuteurField, gbc);
 
-        // Ajout du champ pour le Numéro de Tuteur
         gbc.gridx = 0;
         gbc.gridy++;
         panel.add(new JLabel("Numéro de Tuteur :"), gbc);
@@ -178,7 +168,6 @@ public class ElevePrimaire extends JFrame {
         JTextField numeroTuteurField = new JTextField(20);
         panel.add(numeroTuteurField, gbc);
 
-        // Ajout du champ pour la Classe
         gbc.gridx = 0;
         gbc.gridy++;
         panel.add(new JLabel("Classe :"), gbc);
@@ -186,7 +175,6 @@ public class ElevePrimaire extends JFrame {
         JTextField classeField = new JTextField(20);
         panel.add(classeField, gbc);
 
-        // Ajout du champ pour la Date d'Inscription
         gbc.gridx = 0;
         gbc.gridy++;
         panel.add(new JLabel("Date d'Inscription :"), gbc);
@@ -196,54 +184,46 @@ public class ElevePrimaire extends JFrame {
 
         gbc.gridx = 0;
         gbc.gridy++;
-        gbc.gridwidth = 2; // Occupera 2 colonnes pour le bouton
+        gbc.gridwidth = 2;
         JButton inscriptionButton = new JButton("Inscrire");
         panel.add(inscriptionButton, gbc);
 
-        // Action à effectuer lors du clic sur le bouton Inscrire
         inscriptionButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Insérer les données dans la base de données
                 try {
                     Connection connection = dbConnection.getCon();
-                    String queryEcolier = "INSERT INTO ecolier(matricule, nom, prenom,  date_naiss, lieu_naiss, pere, mere, adresse, tuteur, num_tuteur, classe, date_ins,sexe) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    String queryEcolier = "INSERT INTO ecolier(matricule, nom, prenom, sexe, date_naiss, lieu_naiss, pere, mere, adresse, tuteur, num_tuteur, classe, date_ins) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                     String queryElevePrimaire = "INSERT INTO eleve_primaire(matricule, nom, prenom, sexe, classe, status) VALUES (?, ?, ?, ?, ?, ?)";
 
                     PreparedStatement preparedStatementEcolier = connection.prepareStatement(queryEcolier);
                     PreparedStatement preparedStatementElevePrimaire = connection.prepareStatement(queryElevePrimaire);
 
-                    // Set parameters for ecolier table
                     preparedStatementEcolier.setString(1, matriculeField.getText());
                     preparedStatementEcolier.setString(2, nomField.getText());
                     preparedStatementEcolier.setString(3, prenomField.getText());
+                    preparedStatementEcolier.setString(4, (String) sexeComboBox.getSelectedItem());
+                    preparedStatementEcolier.setString(5, dateNaissanceField.getText());
+                    preparedStatementEcolier.setString(6, lieuNaissanceField.getText());
+                    preparedStatementEcolier.setString(7, pereField.getText());
+                    preparedStatementEcolier.setString(8, mereField.getText());
+                    preparedStatementEcolier.setString(9, adresseField.getText());
+                    preparedStatementEcolier.setString(10, tuteurField.getText());
+                    preparedStatementEcolier.setString(11, numeroTuteurField.getText());
+                    preparedStatementEcolier.setInt(12, Integer.parseInt(classeField.getText()));
+                    preparedStatementEcolier.setString(13, dateInscriptionField.getText());
 
-                    preparedStatementEcolier.setString(4, dateNaissanceField.getText());
-                    preparedStatementEcolier.setString(5, lieuNaissanceField.getText());
-                    preparedStatementEcolier.setString(6, pereField.getText());
-                    preparedStatementEcolier.setString(7, mereField.getText());
-                    preparedStatementEcolier.setString(8, adresseField.getText());
-                    preparedStatementEcolier.setString(9, tuteurField.getText());
-                    preparedStatementEcolier.setString(10, numeroTuteurField.getText());
-                    preparedStatementEcolier.setString(11, classeField.getText());
-                    preparedStatementEcolier.setString(12, dateInscriptionField.getText());
-                    preparedStatementEcolier.setString(13, (String)sexeComboBox.getSelectedItem());
-
-                    // Execute query for ecolier table
                     preparedStatementEcolier.executeUpdate();
 
-                    // Set parameters for eleve_primaire table
                     preparedStatementElevePrimaire.setString(1, matriculeField.getText());
                     preparedStatementElevePrimaire.setString(2, nomField.getText());
                     preparedStatementElevePrimaire.setString(3, prenomField.getText());
-                    preparedStatementElevePrimaire.setString(4, (String)sexeComboBox.getSelectedItem());
-                    preparedStatementElevePrimaire.setString(5, classeField.getText());
-                    preparedStatementElevePrimaire.setString(6, "N"); // Assuming status is always 'N' initially
+                    preparedStatementElevePrimaire.setString(4, (String) sexeComboBox.getSelectedItem());
+                    preparedStatementElevePrimaire.setInt(5, Integer.parseInt(classeField.getText()));
+                    preparedStatementElevePrimaire.setString(6, "N");
 
-                    // Execute query for eleve_primaire table
                     preparedStatementElevePrimaire.executeUpdate();
 
-                    // Close prepared statements
                     preparedStatementEcolier.close();
                     preparedStatementElevePrimaire.close();
 
@@ -257,6 +237,7 @@ public class ElevePrimaire extends JFrame {
 
         return panel;
     }
+
 
     private JPanel createReInscriptionPanel() {
         JPanel panel = new JPanel();
@@ -374,9 +355,7 @@ public class ElevePrimaire extends JFrame {
         String sexe = (sexe_choosed != null && sexe_choosed != "Tous")?sexe_choosed:null;
         String search = (!searchterm.isEmpty())?searchterm:null;
 
-        System.out.println("sexe:" +sexe);
-        System.out.println("status: " +status);
-        System.out.println("search: "+search);
+
         String query = "SELECT * FROM eleve_primaire";
 
         // Ajout de clauses conditionnelles en fonction des paramètres
@@ -413,7 +392,7 @@ public class ElevePrimaire extends JFrame {
         query += " ORDER BY nom";
 
 
-        System.out.println("requete recuperée: "+ query);
+
         try {
             // Connexion à la base de données
             DBConnection con = new DBConnection();
