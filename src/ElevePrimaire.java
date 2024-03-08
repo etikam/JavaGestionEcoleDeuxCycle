@@ -1,15 +1,28 @@
 import javax.swing.*;
 import javax.swing.border.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class ElevePrimaire extends JFrame {
 
     private DBConnection dbConnection;
+    private JPanel liste_header = new JPanel();
+    private JPanel liste_container = new JPanel();
+    private JPanel liste_footer = new JPanel();
+
+    // Création des onglets et des panneaux
+    private JTabbedPane onglets = new JTabbedPane();
+    private JPanel inscriptionPanel = createFormulairePanel();
+    private JPanel reInscriptionPanel = createReInscriptionPanel();
+    private JPanel listePanel = createListePanel();
+    private JTable elevesTable = new JTable();
+    public String query = "";
+    public PreparedStatement ps;
+    public Statement st;
+    public ResultSet rs;
 
     public ElevePrimaire() {
         setTitle("Gestion des élèves primaires");
@@ -20,12 +33,6 @@ public class ElevePrimaire extends JFrame {
 
         dbConnection = new DBConnection(); // Initialisation de la connexion à la base de données
 
-        // Création des onglets et des panneaux
-        JTabbedPane onglets = new JTabbedPane();
-        JPanel inscriptionPanel = createFormulairePanel();
-        JPanel reInscriptionPanel = createReInscriptionPanel();
-        JPanel listePanel = createListePanel();
-
         // Ajout des onglets à la JTabbedPane
         onglets.addTab("Inscription", inscriptionPanel);
         onglets.addTab("Réinscription", reInscriptionPanel);
@@ -33,6 +40,8 @@ public class ElevePrimaire extends JFrame {
 
         // Ajout de la JTabbedPane à la fenêtre
         add(onglets);
+
+        loadElevesData();
         setVisible(true);
     }
 
@@ -48,8 +57,8 @@ public class ElevePrimaire extends JFrame {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(10, 10, 10, 10); // Marge entre les composants
 
-        // Ajout du texte "Ajouté un nouvel élève" au-dessus du formulaire
-        JLabel titreLabel = new JLabel("Ajouté un nouvel élève");
+        // Ajout du texte "Ajouter un nouvel élève" au-dessus du formulaire
+        JLabel titreLabel = new JLabel("Ajouter un nouvel élève");
         titreLabel.setFont(new Font("Arial", Font.BOLD, 16));
         panel.add(titreLabel, gbc);
 
@@ -229,8 +238,99 @@ public class ElevePrimaire extends JFrame {
 
     private JPanel createListePanel() {
         JPanel panel = new JPanel();
-        // Ajoutez ici les composants pour afficher la liste d'élèves
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS)); // Superposition verticale des composants
+        initListPanel();
+        panel.add(liste_header);
+        panel.add(liste_container);
+        panel.add(liste_footer);
         return panel;
     }
 
+    private void initListPanel() {
+        // Initialisation des éléments du header
+        init_list_header();
+        // Initialisation des éléments du container
+        init_list_container();
+        // Initialisation des éléments du footer
+        init_list_footer();
+    }
+
+    private void init_list_header() {
+        JLabel l_search = new JLabel("Taper une recherche: ");
+        JLabel l_classe = new JLabel("Classe: ");
+
+        JTextField txt_search = new JTextField(40);
+        JComboBox<String> classeComboBox = new JComboBox<>(new String[]{"Classe 1", "Classe 2", "Classe 3"}); // Exemple de valeurs de classe
+
+        JButton actualiserButton = new JButton("Actualiser");
+        actualiserButton.addActionListener(e -> {
+            // Implémenter l'action de l'actualisation
+            loadElevesData();
+        });
+
+        liste_header.add(l_search);
+        liste_header.add(txt_search);
+        liste_header.add(l_classe);
+        liste_header.add(classeComboBox);
+        liste_header.add(actualiserButton);
+    }
+
+    private void init_list_container() {
+        // Implémenter la création et le remplissage du tableau avec les élèves de la base de données
+    }
+
+    private void init_list_footer() {
+        JLabel nombreLabel = new JLabel("Nombre d'élèves: "); // Label pour afficher le nombre d'élèves
+
+        // Implémenter la récupération du nombre d'élèves depuis la base de données et l'afficher dans le label
+
+        liste_footer.add(nombreLabel);
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new ElevePrimaire());
+    }
+
+
+    private void loadElevesData() {
+        try {
+            // Connexion à la base de données Oracle
+            DBConnection con = new DBConnection();
+            query = "SELECT * FROM eleve_primaire ORDER BY nom";
+            ps = con.getCon().prepareStatement(query);
+            rs = ps.executeQuery();
+            // Création du modèle de table
+            DefaultTableModel model = new DefaultTableModel();
+            model.addColumn("Matricule");
+            model.addColumn("Nom");
+            model.addColumn("Prénom");
+            model.addColumn("Sexe");
+            model.addColumn("Classe");
+            model.addColumn("Status");
+
+            while (rs.next()) {
+
+                int classe_from_db = rs.getInt("classe");
+                String class_in_table = String.valueOf(classe_from_db);
+                class_in_table = (classe_from_db == 1) ? class_in_table + " ère Année" : class_in_table + " ème Année";
+
+                model.addRow(new Object[]{rs.getString("matricule"), rs.getString("nom"), rs.getString("prenom"),
+
+                        rs.getString("sexe"), class_in_table, rs.getString("status"),
+                });
+            }
+
+            // Fermeture des ressources
+            rs.close();
+            ps.close();
+
+            // Définir le modèle de table pour la JTable
+            elevesTable.setModel(model);
+
+            liste_container.add(elevesTable);
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Erreur lors du chargement des données des élèves. Erreur" + e.getMessage());
+        }
+    }
 }
