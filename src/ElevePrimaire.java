@@ -23,6 +23,12 @@ public class ElevePrimaire extends JFrame {
     private JPanel listePanel = new JPanel();  // l'onglet de liste
     private JTable elevesTable = new JTable();  // la table des eleves pour l'onglet de liste
 
+
+    private JTextField nomFieldReins;
+    private JTextField prenomFieldReins;
+    private JTextField sexeFieldReins;
+    private JTextField classeFieldReins;
+    private JComboBox<String> nouvelleClasseComboBox;
     JLabel nombreLabel = new JLabel("Nombre d'élements: ");// le nombre d'elements dans le tableau
 
     //VARIABLES DE REQUETTES
@@ -30,6 +36,7 @@ public class ElevePrimaire extends JFrame {
     public PreparedStatement ps;
     public Statement st;
     public ResultSet rs;
+    public Connection con;
     JLabel l_search = new JLabel("Taper une recherche: ");
 
     JLabel l_classe = new JLabel("Classe: ");
@@ -46,7 +53,7 @@ public class ElevePrimaire extends JFrame {
     JComboBox<String> comboSexe = new JComboBox<>(new String[]{"Tous","M", "F"});
 
     public ElevePrimaire() {
-
+        dbConnection = new DBConnection();
         //initialisation des composants de la fenetre
         setTitle("Gestion des élèves primaires");
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -70,7 +77,7 @@ public class ElevePrimaire extends JFrame {
         loadElevesData(txt_search.getText(),combo_classe.getSelectedItem().toString(),comboStatus.getSelectedItem().toString(),comboSexe.getSelectedItem().toString());
         // Ajout du ChangeListener pour détecter le changement d'onglet
 
-       // elevesTable.setPreferredSize(new Dimension(this.getWidth(),liste_container.getHeight()));
+        // elevesTable.setPreferredSize(new Dimension(this.getWidth(),liste_container.getHeight()));
 
         setVisible(true);
     }
@@ -240,12 +247,141 @@ public class ElevePrimaire extends JFrame {
 
 
     private JPanel createReInscriptionPanel() {
-        JPanel panel = new JPanel();
-        // Ajoutez ici les composants pour la réinscription
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(10, 10, 10, 10),
+                BorderFactory.createLineBorder(Color.BLACK)
+        ));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(10, 10, 10, 10);
+
+        JLabel headerLabel = new JLabel("Réinscrire Un Elève");
+        headerLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        panel.add(headerLabel, gbc);
+        gbc.gridy++;
+
+        panel.add(new JLabel("Matricule :"), gbc);
+        gbc.gridx = 1;
+        JComboBox<String> matriculeComboBox = new JComboBox<>();
+        matriculeComboBox.setPreferredSize(new Dimension(200, matriculeComboBox.getPreferredSize().height));
+        fillMatriculeComboBox(matriculeComboBox);
+        matriculeComboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String selectedMatricule = (String) matriculeComboBox.getSelectedItem();
+                fillFieldsWithStudentData(selectedMatricule);
+            }
+        });
+        panel.add(matriculeComboBox, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        panel.add(new JLabel("Nom :"), gbc);
+        gbc.gridx = 1;
+        nomFieldReins = new JTextField(20);
+        panel.add(nomFieldReins, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        panel.add(new JLabel("Prénom :"), gbc);
+        gbc.gridx = 1;
+        prenomFieldReins = new JTextField(20);
+        panel.add(prenomFieldReins, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        panel.add(new JLabel("Sexe :"), gbc);
+        gbc.gridx = 1;
+        sexeFieldReins = new JTextField(20);
+        panel.add(sexeFieldReins, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        panel.add(new JLabel("Classe :"), gbc);
+        gbc.gridx = 1;
+        classeFieldReins = new JTextField(20);
+        panel.add(classeFieldReins, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        panel.add(new JLabel("Nouvelle Classe :"), gbc);
+        gbc.gridx = 1;
+        nouvelleClasseComboBox = new JComboBox<>(new String[]{"1", "2", "3"}); // Remplacez les valeurs par celles appropriées
+        panel.add(nouvelleClasseComboBox, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy++;
+        JButton reinscrireButton = new JButton("Réinscrire");
+        reinscrireButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String matricule = (String) matriculeComboBox.getSelectedItem();
+                String nom = nomFieldReins.getText();
+                String prenom = prenomFieldReins.getText();
+                String sexe = sexeFieldReins.getText();
+                String classe = classeFieldReins.getText();
+
+                if (classe.equals((String) nouvelleClasseComboBox.getSelectedItem())) {
+
+                    updateStudentStatus(matricule, "R");
+                } else {
+
+                    String nouvelleClasse_string = nouvelleClasseComboBox.getSelectedItem().toString();
+                    int nouvelleClasse = Integer.parseInt(nouvelleClasse_string);
+                    updateStudentClassAndStatus(matricule, nouvelleClasse);
+                }
+/*
+                try {
+                    Connection connection = dbConnection.getCon();
+                    String query = "UPDATE eleve_primaire SET nom=?, prenom=?, sexe=?, classe=? WHERE matricule=?";
+                    PreparedStatement preparedStatement = connection.prepareStatement(query);
+                    preparedStatement.setString(1, nom);
+                    preparedStatement.setString(2, prenom);
+                    preparedStatement.setString(3, sexe);
+                    preparedStatement.setString(4, classe);
+                    preparedStatement.setString(5, matricule);
+                    preparedStatement.executeUpdate();
+                    JOptionPane.showMessageDialog(null, "on m'a changé !");
+                    preparedStatement.close();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "Erreur lors de la mise à jour des données : " + ex.getMessage());
+                }
+
+ */
+
+            }
+        });
+
+        panel.add(reinscrireButton, gbc);
+
         return panel;
     }
 
 
+
+    private void fillFieldsWithStudentData(String matricule) {
+        try {
+            Connection connection = dbConnection.getCon();
+            String query = "SELECT nom, prenom, sexe, classe FROM eleve_primaire WHERE matricule = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, matricule);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                nomFieldReins.setText(resultSet.getString("nom"));
+                prenomFieldReins.setText(resultSet.getString("prenom"));
+                sexeFieldReins.setText(resultSet.getString("sexe"));
+                classeFieldReins.setText((String)resultSet.getString("classe"));
+            }
+            preparedStatement.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Erreur lors de la récupération des données de l'élève !" + ex.getMessage());
+        }
+    }
 
     //PARAMETRAGE DE L'ONGLET LISTE
     private void initListPanel() {
@@ -298,7 +434,7 @@ public class ElevePrimaire extends JFrame {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "erreur: " + e.getMessage());
         }// Exemple de valeurs de classe
-            // Ajout du combo pour le filtre par status
+        // Ajout du combo pour le filtre par status
 
         JButton actualiserButton = new JButton("Actualiser");
         actualiserButton.addActionListener(e -> {
@@ -328,7 +464,7 @@ public class ElevePrimaire extends JFrame {
     }
 
     private void init_list_footer() {
-         // Label pour afficher le nombre d'élèves
+        // Label pour afficher le nombre d'élèves
         nombreLabel.setForeground(Color.white);
         nombreLabel.setFont(new Font("Arial Black",Font.BOLD,20));
         // Implémenter la récupération du nombre d'élèves depuis la base de données et l'afficher dans le label
@@ -433,7 +569,65 @@ public class ElevePrimaire extends JFrame {
             JOptionPane.showMessageDialog(null, "Erreur lors du chargement des données des élèves. Erreur" + e.getMessage());
         }
     }
+    private void fillMatriculeComboBox(JComboBox<String> comboBox) {
+        try {
 
+            DBConnection connection = new DBConnection();
+            connection.getCon();
+            String query = "SELECT matricule FROM eleve_primaire";
+            PreparedStatement preparedStatement = connection.getCon().prepareStatement(query);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                comboBox.addItem(resultSet.getString("matricule"));
+            }
+            preparedStatement.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Erreur lors de la récupération des matricules !" + ex.getMessage());
+        }
+    }
+
+
+    private void updateStudentStatus(String matricule, String statut) {
+        try {
+            Connection connection = dbConnection.getCon();
+            String query = "UPDATE eleve_primaire SET status = ? WHERE matricule = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, statut);
+            preparedStatement.setString(2, matricule);
+            preparedStatement.executeUpdate();
+            JOptionPane.showMessageDialog(null,"Données mises à jour avec succès");
+            preparedStatement.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Erreur lors de la mise à jour du statut de l'élève !" + ex.getMessage());
+        }
+    }
+
+    private void updateStudentClassAndStatus(String matricule, int nouvelleClasse) {
+
+
+
+        try {
+            Connection connection = dbConnection.getCon();
+            String query = "UPDATE eleve_primaire SET classe = ?, status =?  WHERE matricule = ?";
+
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+
+
+            preparedStatement.setInt(1, nouvelleClasse);
+            preparedStatement.setString(2, "N");
+            preparedStatement.setString(3, matricule);
+
+
+            preparedStatement.executeUpdate();
+            JOptionPane.showMessageDialog(null,"Données mises à jour avec succès");
+            preparedStatement.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Erreur lors de la mise à jour de la classe et du statut de l'élève !" + ex.getMessage());
+        }
+    }
 
 
 }
