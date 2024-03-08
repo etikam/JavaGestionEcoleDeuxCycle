@@ -131,7 +131,7 @@ public class Fn_Dossier extends JFrame {
             JOptionPane.showMessageDialog(null, "Erreur lors du chargement de la photo. Erreur" + e.getMessage());
         }
     }
-
+    //methode de chargement de données dans la table
     private void loadElevesData() {
         try {
             // Connexion à la base de données Oracle

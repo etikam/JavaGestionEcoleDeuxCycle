@@ -1,5 +1,8 @@
 import javax.swing.*;
 import javax.swing.border.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.plaf.BorderUIResource;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -9,27 +12,47 @@ import java.sql.*;
 public class ElevePrimaire extends JFrame {
 
     private DBConnection dbConnection;
-    private JPanel liste_header = new JPanel();
-    private JPanel liste_container = new JPanel();
-    private JPanel liste_footer = new JPanel();
+    private JPanel liste_header = new JPanel(); //l'entete pour l'onglet liste
+    private JPanel liste_container = new JPanel(); // le milieu pour l'onglet liste
+    private JPanel liste_footer = new JPanel(); // le pied de page pour l'onglet liste
 
     // Création des onglets et des panneaux
-    private JTabbedPane onglets = new JTabbedPane();
-    private JPanel inscriptionPanel = createFormulairePanel();
-    private JPanel reInscriptionPanel = createReInscriptionPanel();
-    private JPanel listePanel = createListePanel();
-    private JTable elevesTable = new JTable();
+    private JTabbedPane onglets = new JTabbedPane();  // les onglets
+    private JPanel inscriptionPanel = new JPanel(); //l'onglet d'inscription
+    private JPanel reInscriptionPanel = new JPanel(); // l'onglet de réinscription
+    private JPanel listePanel = new JPanel();  // l'onglet de liste
+    private JTable elevesTable = new JTable();  // la table des eleves pour l'onglet de liste
+
+    JLabel nombreLabel = new JLabel("Nombre d'élements: ");// le nombre d'elements dans le tableau
+
+    //VARIABLES DE REQUETTES
     public String query = "";
     public PreparedStatement ps;
     public Statement st;
     public ResultSet rs;
+    JLabel l_search = new JLabel("Taper une recherche: ");
+
+    JLabel l_classe = new JLabel("Classe: ");
+
+
+    JComboBox combo_classe = new JComboBox();
+    JTextField txt_search = new JTextField(40);
+
+    JLabel l_status  = new JLabel("Status");
+    JComboBox<String> comboStatus = new JComboBox<>(new String[]{"Tous","N", "R"});
+
+    // Ajout du combo pour le filtre par sexe
+    JLabel l_sexe  = new JLabel("Sexe");
+    JComboBox<String> comboSexe = new JComboBox<>(new String[]{"Tous","M", "F"});
 
     public ElevePrimaire() {
+
+        //initialisation des composants de la fenetre
         setTitle("Gestion des élèves primaires");
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setSize(screenSize);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Ferme uniquement cette fenêtre
-        setResizable(false);
+        setResizable(true);
 
         dbConnection = new DBConnection(); // Initialisation de la connexion à la base de données
 
@@ -40,10 +63,15 @@ public class ElevePrimaire extends JFrame {
 
         // Ajout de la JTabbedPane à la fenêtre
         add(onglets);
+        initListPanel();
+        loadElevesData(txt_search.getText(),combo_classe.getSelectedItem().toString(),comboStatus.getSelectedItem().toString(),comboSexe.getSelectedItem().toString());
+        // Ajout du ChangeListener pour détecter le changement d'onglet
 
-        loadElevesData();
+       // elevesTable.setPreferredSize(new Dimension(this.getWidth(),liste_container.getHeight()));
+
         setVisible(true);
     }
+
 
     private JPanel createFormulairePanel() {
         JPanel panel = new JPanel(new GridBagLayout());
@@ -236,43 +264,82 @@ public class ElevePrimaire extends JFrame {
         return panel;
     }
 
-    private JPanel createListePanel() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS)); // Superposition verticale des composants
-        initListPanel();
-        panel.add(liste_header);
-        panel.add(liste_container);
-        panel.add(liste_footer);
-        return panel;
-    }
 
+
+    //PARAMETRAGE DE L'ONGLET LISTE
     private void initListPanel() {
+        listePanel.setBackground(Color.white);
+        elevesTable.setSize(listePanel.getWidth()-100,listePanel.getHeight()-100);
         // Initialisation des éléments du header
         init_list_header();
         // Initialisation des éléments du container
         init_list_container();
         // Initialisation des éléments du footer
         init_list_footer();
+
+        //classement des conteneur sur le page de l'onglet
+        listePanel.setLayout(new BorderLayout());
+        liste_header.setBackground(Color.gray);
+        listePanel.add(liste_header,BorderLayout.NORTH);
+        liste_container.setBackground(Color.white);
+        listePanel.add(liste_container, BorderLayout.CENTER);
+        liste_footer.setBackground(Color.black);
+        listePanel.add(liste_footer,BorderLayout.SOUTH);
+
+
+        // Chargement des liste dans la table
+        //loadElevesData();
+
+        // Ajustement du tableau pour remplir tout l'espace horizontal du conteneur parent
+        JScrollPane scrollPane = new JScrollPane(elevesTable);
+        scrollPane.setBackground(Color.white);
+        liste_container.setLayout(new BorderLayout());
+        liste_container.add(scrollPane, BorderLayout.CENTER);
     }
 
     private void init_list_header() {
-        JLabel l_search = new JLabel("Taper une recherche: ");
-        JLabel l_classe = new JLabel("Classe: ");
+        //declaration customisation des composants locaux
 
-        JTextField txt_search = new JTextField(40);
-        JComboBox<String> classeComboBox = new JComboBox<>(new String[]{"Classe 1", "Classe 2", "Classe 3"}); // Exemple de valeurs de classe
+        l_search.setForeground(Color.white);
+        l_search.setFont(new Font("Algerian",Font.BOLD,15));
+        l_classe.setForeground(Color.white);
+        l_classe.setFont(new Font("Algerian",Font.BOLD,15));
+        // Ajoutez ici les classes disponibles dans le JComboBox
+        DBConnection con = new DBConnection();
+        combo_classe.addItem("Toutes");
+        try {
+            query = "SELECT * FROM classe_primaire";
+            ps = con.getCon().prepareStatement(query);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                combo_classe.addItem(String.valueOf(rs.getInt("num_classe") + (rs.getInt("num_classe") == 1 ? " ère Annéé" : " ème Année")));
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "erreur: " + e.getMessage());
+        }// Exemple de valeurs de classe
+            // Ajout du combo pour le filtre par status
 
         JButton actualiserButton = new JButton("Actualiser");
         actualiserButton.addActionListener(e -> {
-            // Implémenter l'action de l'actualisation
-            loadElevesData();
+            // Actualisation de la liste
+            loadElevesData(txt_search.getText(),combo_classe.getSelectedItem().toString(),comboStatus.getSelectedItem().toString(),comboSexe.getSelectedItem().toString());
         });
+
+
 
         liste_header.add(l_search);
         liste_header.add(txt_search);
         liste_header.add(l_classe);
-        liste_header.add(classeComboBox);
+        liste_header.add(combo_classe);
+        liste_header.add(l_status);
+        liste_header.add(comboStatus);
+        liste_header.add(l_sexe);
+        liste_header.add(comboSexe);
         liste_header.add(actualiserButton);
+
+        //modification des dimension du panel d'entete
+
+        liste_header.setPreferredSize(new Dimension(listePanel.getWidth(),80));
     }
 
     private void init_list_container() {
@@ -280,10 +347,11 @@ public class ElevePrimaire extends JFrame {
     }
 
     private void init_list_footer() {
-        JLabel nombreLabel = new JLabel("Nombre d'élèves: "); // Label pour afficher le nombre d'élèves
-
+         // Label pour afficher le nombre d'élèves
+        nombreLabel.setForeground(Color.white);
+        nombreLabel.setFont(new Font("Arial Black",Font.BOLD,20));
         // Implémenter la récupération du nombre d'élèves depuis la base de données et l'afficher dans le label
-
+        liste_footer.setPreferredSize(new Dimension(this.getWidth(),70));
         liste_footer.add(nombreLabel);
     }
 
@@ -291,14 +359,67 @@ public class ElevePrimaire extends JFrame {
         SwingUtilities.invokeLater(() -> new ElevePrimaire());
     }
 
+    // methode de chargement de la liste des etudiants dans la table
+    private void loadElevesData(String searchterm, String classe_choosed, String status_choosed, String sexe_choosed) {
+        // Construction de la requête de base
+        String chars[]={};
+        if(classe_choosed!="Toutes"|| classe_choosed!=null){
+            chars = classe_choosed.split(" ");
+        }
+        //traitement des parametre pour la génération de la requete
 
-    private void loadElevesData() {
+        int classe = (classe_choosed==null || classe_choosed=="Toutes")?0:(Integer.parseInt(chars[0]));
+
+        String status = (status_choosed != null && status_choosed != "Tous")?status_choosed:null;
+        String sexe = (sexe_choosed != null && sexe_choosed != "Tous")?sexe_choosed:null;
+        String search = (!searchterm.isEmpty())?searchterm:null;
+
+        System.out.println("sexe:" +sexe);
+        System.out.println("status: " +status);
+        System.out.println("search: "+search);
+        String query = "SELECT * FROM eleve_primaire";
+
+        // Ajout de clauses conditionnelles en fonction des paramètres
+        if (classe != 0 || status !=null || sexe != null || search !=null){
+
+            query += " WHERE";
+
+            // Ajout de la clause pour la classe
+            if (classe != 0) {
+                query += " classe = " + classe;
+            }
+
+            // Ajout de la clause pour le statut
+            if (status != null ) {
+                if (classe != 0) {
+                    query += " AND";
+                }
+                query += " status = '" + status + "'";}            // Ajout de la clause pour le sexe
+            if (sexe != null) {
+                if (classe != 0 || status != null) {
+                    query += " AND";
+                }
+                query += " sexe = '" + sexe + "'";
+            }
+
+            if(search != null){
+                if(classe != 0 || status != null || sexe != null){
+                    query += " AND";
+                }
+                query += " matricule = '" + search + "'";
+            }
+        }
+
+        query += " ORDER BY nom";
+
+
+        System.out.println("requete recuperée: "+ query);
         try {
-            // Connexion à la base de données Oracle
+            // Connexion à la base de données
             DBConnection con = new DBConnection();
-            query = "SELECT * FROM eleve_primaire ORDER BY nom";
             ps = con.getCon().prepareStatement(query);
             rs = ps.executeQuery();
+
             // Création du modèle de table
             DefaultTableModel model = new DefaultTableModel();
             model.addColumn("Matricule");
@@ -309,22 +430,22 @@ public class ElevePrimaire extends JFrame {
             model.addColumn("Status");
 
             while (rs.next()) {
-
+                // Ajout des données de l'élève au modèle de table
                 int classe_from_db = rs.getInt("classe");
-                String class_in_table = String.valueOf(classe_from_db);
-                class_in_table = (classe_from_db == 1) ? class_in_table + " ère Année" : class_in_table + " ème Année";
+                String class_in_table = (classe_from_db == 1) ? classe_from_db + " ère Année" : classe_from_db + " ème Année";
 
                 model.addRow(new Object[]{rs.getString("matricule"), rs.getString("nom"), rs.getString("prenom"),
-
-                        rs.getString("sexe"), class_in_table, rs.getString("status"),
-                });
+                        rs.getString("sexe"), class_in_table, rs.getString("status")});
             }
+            int nbr = ps.executeUpdate();
 
+            //System.out.println("nombre de lignes: " +nbr);
+            nombreLabel.setText(nbr==0?"aucune ligne correspondante":(nbr>1?String.valueOf(nbr)+" Lignes correspondantes":String.valueOf(nbr)+" Ligne correspondante"));
             // Fermeture des ressources
             rs.close();
             ps.close();
 
-            // Définir le modèle de table pour la JTable
+            // Définition du modèle de table pour la JTable
             elevesTable.setModel(model);
 
             liste_container.add(elevesTable);
@@ -333,4 +454,7 @@ public class ElevePrimaire extends JFrame {
             JOptionPane.showMessageDialog(null, "Erreur lors du chargement des données des élèves. Erreur" + e.getMessage());
         }
     }
+
+
+
 }
